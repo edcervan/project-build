@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-def execute_shell_command(cmd, work_dir):
+def execute_shell_command(cmd, work_dir=None):
     """Executes a shell command in a subprocess, waiting until it has completed.
 
     :param cmd: Command to execute.
