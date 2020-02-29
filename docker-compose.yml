@@ -1,0 +1,89 @@
+version: '3.6'
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - xpack.security.enabled=true
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - ELASTIC_USER=elasticsearch
+      - ELASTIC_PASSWORD=oathEM73kQ
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - practice
+
+  mysql:
+    image: mysql:latest
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3307
+      - MYSQL_DATABASE=oath
+      - MYSQL_USER=oath
+      - MYSQL_PASSWORD=oathNc6DxG
+      - MYSQL_ROOT_PASSWORD=oathWh4PVq
+    command: --default-authentication-plugin=mysql_native_password --mysqlx=0
+    ports:
+      - '3307:3307'
+    networks:
+      - practice
+
+  practice-api:
+    image: practice-api:latest
+    build: ./backend/practice_api
+    volumes:
+      - ./rest_api:/app
+    ports:
+      - "9100:8000"
+    command: manage.py runserver
+    environment:
+      - DJANGO_APP_DEBUG=1
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3307
+      - MYSQL_DATABASE=oath
+      - MYSQL_USER=oath
+      - MYSQL_PASSWORD=oathNc6DxG
+      - ES_HOST=elasticsearch
+      - ES_PORT_1=9200
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=oathEM73kQ
+    depends_on:
+      - mysql
+      - elasticsearch
+    networks:
+      - practice
+    restart: on-failure:5
+
+  practice-ui:
+    build:
+      context: ./frontend/practice-ui
+      dockerfile: Dockerfile
+    image: practice-ui
+    ports:
+      - 8000:8000
+    volumes:
+      - ./MainUI/src:/opt/src
+    working_dir: /opt
+    command: ojet serve
+
+volumes:
+  mysql-data:
+  elasticsearch-data:
+    driver: local
+
+networks:
+  practice:
