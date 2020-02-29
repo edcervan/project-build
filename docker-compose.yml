@@ -46,10 +46,11 @@ services:
     image: practice-api:latest
     build: ./backend/practice_api
     volumes:
-      - ./rest_api:/app
+      - ./backend/practice_api:/app
+    working_dir: /app
     ports:
-      - "9100:8000"
-    command: manage.py runserver
+      - 9100:8000
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       - DJANGO_APP_DEBUG=1
       - MYSQL_HOST=mysql
@@ -72,13 +73,18 @@ services:
     build:
       context: ./frontend/practice-ui
       dockerfile: Dockerfile
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
     image: practice-ui
     ports:
       - 8000:8000
     volumes:
-      - ./MainUI/src:/opt/src
-    working_dir: /opt
-    command: ojet serve
+      - ./frontend/practice-ui/src:/opt/data/app/src
+    entrypoint: /opt/data/entrypoint.sh
+    networks:
+      - practice
 
 volumes:
   mysql-data:
