@@ -2,3 +2,4 @@
 backend/
 frontend/
 .idea/
+__pycache__/
