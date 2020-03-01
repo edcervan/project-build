@@ -17,7 +17,7 @@ and download the latest version.
 
 This option allows to make changes directly in the code and see them reflected immediately after saving.
 Run the next command:
-`docker-compose -f docker-compose-local.yml up -d`
+`docker-compose up`
 or in Pycharm right click on the file docker-compose-local.yml and run.
 
 
